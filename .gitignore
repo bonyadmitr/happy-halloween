@@ -1,0 +1,13 @@
+.DS_Store
+Thumbs.db
+*.log
+
+# Dev/тесты — не деплоится (GitHub Pages отдаёт только статику)
+node_modules/
+test-results/
+playwright-report/
+.playwright/
+
+# Тулинг извлечения битов: venv и временное аудио (скрипт extract.py коммитим)
+tools/beatmap/.venv/
+tools/beatmap/*.wav

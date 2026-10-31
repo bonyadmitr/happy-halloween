@@ -1,0 +1,135 @@
+#!/usr/bin/env python3
+"""
+Извлечение карты битов из mp3 в js/rhythm-beatmap.js (разовый оффлайн-шаг).
+
+Не деплоится и не нужен в рантайме — сайт использует уже готовый
+js/rhythm-beatmap.js. Запускать заново только при смене песни.
+
+Использование:
+    tools/beatmap/.venv/bin/python tools/beatmap/extract.py \
+        assets/audio/mary-on-a-cross-loop.mp3 \
+        --src assets/audio/mary-on-a-cross-loop.mp3 \
+        --out js/rhythm-beatmap.js
+
+Опции:
+    --min-gap  минимальный интервал между нотами (сек), прореживает частые доли
+    --bpm      фолбэк: ровная сетка по BPM вместо анализа (если анализ «грязный»)
+    --offset   сдвиг первой доли для --bpm (сек)
+"""
+import argparse
+import sys
+
+
+def beats_from_analysis(path, min_gap):
+    import librosa
+    y, sr = librosa.load(path, sr=None, mono=True)
+    duration = librosa.get_duration(y=y, sr=sr)
+    _, beat_frames = librosa.beat.beat_track(y=y, sr=sr, units="frames")
+    times = librosa.frames_to_time(beat_frames, sr=sr)
+    beats = thin(list(times), min_gap)
+    return duration, beats
+
+
+def beats_from_accents(path, min_gap, top):
+    """Ключевые акценты песни: онсеты (перцептивные атаки нот), отобранные по силе.
+    Даёт НЕравномерный, музыкальный ритм (кластеры + паузы), а не ровный метроном.
+      top — доля самых сильных онсетов, которую оставляем (0.6 = верхние 60%)."""
+    import librosa
+    import numpy as np
+
+    y, sr = librosa.load(path, sr=None, mono=True)
+    duration = librosa.get_duration(y=y, sr=sr)
+    onset_env = librosa.onset.onset_strength(y=y, sr=sr)
+    frames = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr, backtrack=False)
+    if not len(frames):
+        return duration, []
+    times = librosa.frames_to_time(frames, sr=sr)
+    strengths = onset_env[frames]
+    thresh = np.quantile(strengths, 1.0 - top)
+    cand = [(float(t), float(s)) for t, s in zip(times, strengths) if s >= thresh]
+    return duration, thin_by_strength(cand, min_gap)
+
+
+def thin_by_strength(pairs, min_gap):
+    """Прорядить (t, strength) с зазором min_gap, в конфликте оставляя более сильный."""
+    kept = []  # list of [t, s]
+    for t, s in sorted(pairs):
+        if kept and t - kept[-1][0] < min_gap:
+            if s > kept[-1][1]:
+                kept[-1] = [t, s]  # заменить слабый близкий на более сильный
+            continue
+        kept.append([t, s])
+    return [round(t, 3) for t, _ in kept]
+
+
+def beats_from_bpm(path, bpm, offset, min_gap):
+    import librosa
+    y, sr = librosa.load(path, sr=None, mono=True)
+    duration = librosa.get_duration(y=y, sr=sr)
+    step = 60.0 / bpm
+    beats, t = [], offset
+    while t < duration:
+        beats.append(t)
+        t += step
+    return duration, thin(beats, min_gap)
+
+
+def thin(beats, min_gap):
+    """Убрать доли ближе min_gap друг к другу (сохраняя первую в группе)."""
+    out = []
+    for b in sorted(beats):
+        if not out or b - out[-1] >= min_gap:
+            out.append(round(float(b), 3))
+    return out
+
+
+def write_js(out_path, src, duration, beats):
+    rows = []
+    for i in range(0, len(beats), 10):
+        rows.append("    " + ", ".join(f"{b:.3f}" for b in beats[i : i + 10]))
+    beats_js = ",\n".join(rows)
+    js = (
+        "// Карта битов This Is Halloween — СГЕНЕРЕНО tools/beatmap/extract.py.\n"
+        "// Не редактировать руками; пересобрать: см. tools/beatmap/extract.py.\n"
+        "// Данные конкретной песни, отдельно от движка (js/rhythm.js).\n"
+        "window.RHYTHM_BEATMAP = {\n"
+        f'  src: "{src}",\n'
+        f"  duration: {duration:.3f}, // длина лупа, сек\n"
+        f"  beats: [ // {len(beats)} долей, времена в секундах от начала лупа\n"
+        f"{beats_js}\n"
+        "  ],\n"
+        "};\n"
+    )
+    with open(out_path, "w") as f:
+        f.write(js)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("audio")
+    ap.add_argument("--src", required=True, help="путь к аудио как в рантайме сайта")
+    ap.add_argument("--out", default="js/rhythm-beatmap.js")
+    ap.add_argument("--min-gap", type=float, default=0.28)
+    ap.add_argument("--bpm", type=float, default=None)
+    ap.add_argument("--offset", type=float, default=0.0)
+    ap.add_argument("--accent", action="store_true", help="ключевые акценты (онсеты по силе), неравномерно")
+    ap.add_argument("--top", type=float, default=0.6, help="доля самых сильных онсетов для --accent")
+    args = ap.parse_args()
+
+    if args.bpm:
+        duration, beats = beats_from_bpm(args.audio, args.bpm, args.offset, args.min_gap)
+    elif args.accent:
+        duration, beats = beats_from_accents(args.audio, args.min_gap, args.top)
+    else:
+        duration, beats = beats_from_analysis(args.audio, args.min_gap)
+
+    if not beats:
+        print("НЕТ долей — проверь файл/опции", file=sys.stderr)
+        sys.exit(1)
+
+    write_js(args.out, args.src, duration, beats)
+    print(f"OK: {len(beats)} долей, duration={duration:.3f}s -> {args.out}")
+
+
+if __name__ == "__main__":
+    main()

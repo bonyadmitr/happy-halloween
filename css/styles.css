@@ -1,0 +1,767 @@
+/* ==========================================================================
+   Счастливого Halloween — стили
+   Одна тема: ночь на кладбище, луна и тыква-фонарь. Всё оформление держится
+   на палитре ниже (:root) — меняешь переменные, и меняется весь сайт.
+   ========================================================================== */
+
+/* ---- Reset ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ==========================================================================
+   Палитра и типографика  (единственная точка правды по цвету/шрифтам)
+   ========================================================================== */
+:root {
+  color-scheme: dark;
+
+  /* Цвета */
+  --night: #1b1030; /* фон-небо */
+  --night-2: #2c1650; /* верх неба, сиреневый */
+  --night-3: #0f081d; /* силуэты кладбища */
+  --pumpkin: #ff7a1a; /* доминирующий акцент */
+  --pumpkin-deep: #d9480f;
+  --candle: #ffc94a; /* огонь свечи — контрапункт */
+  --bone: #f1e7d0; /* основной текст, паутина, призраки */
+  --bone-soft: #b8a9cc; /* приглушённый текст */
+  --moon: #f7ecc9;
+  --confetti-colors: #ff7a1a, #ffc94a, #f1e7d0, #8b5cf6, #ff9a3c;
+
+  /* Ритм-игра */
+  --rg-lane: rgba(241, 231, 208, 0.07); /* фон полосы */
+  --rg-target: var(--pumpkin); /* кольцо-цель */
+  --rg-note: var(--bone); /* нота-призрак */
+
+  /* Шрифты: капающий дисплей + рукописный текст (с кириллицей) */
+  --font-display: "Creepster", "Underdog", fantasy;
+  --font-body: "Underdog", system-ui, -apple-system, sans-serif;
+}
+
+/* ==========================================================================
+   Фон-атмосфера
+   ========================================================================== */
+html {
+  height: 100%;
+  overflow-x: hidden; /* жёстко: никакой горизонтальной прокрутки/швов на iOS */
+  /* фон под резинку-overscroll (баунс), иначе по краям мелькают светлые поля */
+  background: var(--night);
+  touch-action: manipulation; /* снимаем double-tap-зум */
+}
+body {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  touch-action: manipulation;
+  font-family: var(--font-body);
+  color: var(--bone);
+  /* прозрачно: небо живёт на слое .bg (z-index:-1) */
+  background: transparent;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* Фон: ФИКСИРОВАННЫЙ слой (не background-attachment:fixed — швы на iOS).
+   contain:paint обязателен — летучие мыши едут transform'ом за край экрана,
+   а iOS не обрезает промоутнутых детей фикс-слоя одним overflow. */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: clip;
+  contain: layout paint size;
+  background-color: var(--night);
+  background-image:
+    radial-gradient(70% 45% at 80% 8%, rgba(139, 92, 246, 0.28) 0%, rgba(139, 92, 246, 0) 70%),
+    radial-gradient(60% 40% at 15% 70%, rgba(255, 122, 26, 0.1) 0%, rgba(255, 122, 26, 0) 70%),
+    linear-gradient(180deg, var(--night-2) 0%, var(--night) 55%, #140b26 100%);
+}
+/* Звёзды — точечные радиалки, без картинок */
+.bg::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 35% 0;
+  opacity: 0.7;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 28% 8%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 44% 26%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 58% 12%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 66% 36%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 90% 40%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 8% 48%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 36% 52%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 76% 58%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 52% 64%, #fff 50%, transparent 51%);
+}
+
+.moon {
+  position: absolute;
+  top: max(9vh, calc(env(safe-area-inset-top) + 4.5rem));
+  right: 10vw;
+  width: min(30vw, 170px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 38%, rgba(196, 178, 130, 0.45) 0 9%, transparent 10%),
+    radial-gradient(circle at 62% 62%, rgba(196, 178, 130, 0.38) 0 13%, transparent 14%),
+    radial-gradient(circle at 66% 30%, rgba(196, 178, 130, 0.3) 0 6%, transparent 7%),
+    radial-gradient(circle at 40% 40%, #fffbea, var(--moon) 55%, #e2d29f);
+  box-shadow:
+    0 0 40px rgba(247, 236, 201, 0.45),
+    0 0 120px rgba(247, 236, 201, 0.18);
+}
+
+/* Паутина в верхних углах (путь строится в main.js) */
+.web {
+  position: absolute;
+  top: 0;
+  width: min(44vw, 250px);
+  height: min(44vw, 250px);
+  fill: none;
+  stroke: var(--bone);
+  stroke-opacity: 0.32;
+  stroke-width: 1;
+  overflow: visible;
+}
+.web-left {
+  left: 0;
+}
+.web-right {
+  right: 0;
+  transform: scaleX(-1);
+}
+
+/* Кладбище-силуэт у нижнего края */
+.graveyard {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: clamp(100px, 26vw, 230px);
+  overflow: visible; /* холм продолжается за viewBox — на широких экранах до краёв */
+  fill: var(--night-3);
+  stroke: var(--night-3);
+}
+
+/* Туман: бесшовно ползущая полоса (background-position, без transform) */
+.fog {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 30vh;
+  opacity: 0.55;
+  background-image:
+    radial-gradient(closest-side, rgba(184, 169, 204, 0.32), transparent),
+    radial-gradient(closest-side, rgba(184, 169, 204, 0.22), transparent);
+  background-size: 520px 60%, 380px 45%;
+  background-position: 0 100%, 140px 80%;
+  background-repeat: repeat-x;
+  animation: fog-drift 38s linear infinite;
+}
+
+/* Летучие мыши (спавнятся из main.js, летят через небо) */
+.bat {
+  position: absolute;
+  left: 0;
+  width: var(--w, 46px);
+  fill: #120a20;
+  filter: drop-shadow(0 0 1px rgba(241, 231, 208, 0.35));
+  animation: bat-fly var(--dur, 9s) linear forwards;
+}
+.bat svg {
+  display: block;
+  width: 100%;
+  animation: flap 0.22s ease-in-out infinite alternate;
+  transform-origin: 50% 40%;
+}
+
+/* ==========================================================================
+   Тыква-фонарь (общая для интро и финала)
+   ========================================================================== */
+.pumpkin {
+  position: relative;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.pumpkin-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 0 22px rgba(255, 80, 10, 0.4));
+  transition: filter 0.35s ease;
+}
+.pk-face {
+  animation: flicker 3.2s ease-in-out infinite;
+}
+/* Свеча зажжена: лицо горит ровно и ярко, сияние шире */
+.pumpkin.lit .pk-face {
+  animation: flicker-lit 1.6s ease-in-out infinite;
+}
+.pumpkin.lit .pumpkin-svg {
+  filter: drop-shadow(0 0 34px rgba(255, 90, 20, 0.75));
+}
+.pumpkin:focus-visible {
+  outline: 3px solid var(--candle);
+  outline-offset: 12px;
+  border-radius: 24px;
+}
+
+/* ==========================================================================
+   Интро
+   ========================================================================== */
+.intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1.5rem, 6vh, 3rem);
+  padding: max(2rem, env(safe-area-inset-top)) 1.5rem
+    max(2rem, env(safe-area-inset-bottom));
+  transition: opacity 0.7s ease, transform 0.7s ease, visibility 0.7s;
+}
+.intro-screen.gone {
+  opacity: 0;
+  transform: scale(1.12);
+  visibility: hidden;
+  pointer-events: none;
+}
+.intro-pumpkin {
+  width: min(52vw, 230px);
+  animation: sway 3s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+/* До тапа свеча едва тлеет */
+.intro-pumpkin:not(.lit) .pk-face {
+  opacity: 0.4;
+  animation: smoulder 2.4s ease-in-out infinite;
+}
+.intro-screen.opening .intro-pumpkin {
+  animation: pumpkin-burst 0.75s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s forwards;
+}
+.intro-hint {
+  font-size: clamp(1.1rem, 5vw, 1.45rem);
+  color: var(--bone-soft);
+  animation: pulse 1.8s ease-in-out infinite;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Основной сайт
+   ========================================================================== */
+.site {
+  position: relative;
+  z-index: 1;
+}
+
+.section {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: max(3rem, env(safe-area-inset-top)) 1.5rem
+    max(3rem, env(safe-area-inset-bottom));
+  gap: 1.25rem;
+}
+
+/* ---- Hero ---- */
+.hero-greeting {
+  font-size: clamp(1.3rem, 6vw, 2.1rem);
+  color: var(--bone-soft);
+  letter-spacing: 0.04em;
+}
+.hero-title {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(3.4rem, 21vw, 9rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  max-width: 100%;
+  /* отступы: background-clip:text красит только внутри бокса, а капли Creepster
+     свисают ниже базовой линии — без padding их срежет ровной линией */
+  padding: 0.06em 0.12em 0.22em;
+  background: linear-gradient(180deg, var(--candle) 0%, var(--pumpkin) 45%, var(--pumpkin-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-title::after {
+  content: "";
+  position: absolute;
+  inset: -15% -8%;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(255, 122, 26, 0.32), transparent);
+  filter: blur(12px);
+}
+.hero-subtitle {
+  max-width: 25ch;
+  font-size: clamp(1.05rem, 4.5vw, 1.3rem);
+  color: var(--bone);
+  line-height: 1.6;
+}
+
+.scroll-cue {
+  margin-top: clamp(1.5rem, 8vh, 4rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--bone-soft);
+  font-size: 0.9rem;
+  animation: bob 1.8s ease-in-out infinite;
+}
+.chevron {
+  width: 11px;
+  height: 11px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* ---- Финал: тыква-фонарь ---- */
+.finale {
+  position: relative;
+  gap: 1.6rem;
+}
+.finale-pumpkin {
+  width: min(66vw, 320px);
+  transition: transform 0.2s ease;
+}
+.finale-pumpkin .pumpkin-svg {
+  animation: breathe 2.8s ease-in-out infinite;
+  transform-origin: 50% 85%;
+}
+.finale-pumpkin:active {
+  transform: scale(0.95);
+}
+.finale-caption {
+  font-size: clamp(1rem, 4.3vw, 1.2rem);
+  color: var(--bone-soft);
+  max-width: 24ch;
+}
+
+/* Второстепенная кнопка «Happy Halloween» (залп конфетти) — мелкая, у самого низа экрана */
+.btn-replay {
+  position: absolute;
+  left: 50%;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  font: inherit;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  color: var(--bone);
+  background: rgba(15, 8, 29, 0.55);
+  border: 1px solid rgba(255, 122, 26, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 0.5rem 1.1rem;
+  min-height: 40px;
+  border-radius: 999px;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+.btn-replay:hover {
+  opacity: 1;
+}
+.btn-replay:active {
+  transform: translateX(-50%) scale(0.95);
+}
+.btn-replay:focus-visible {
+  outline: 2px solid var(--candle);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   Ритм-игра (на финальном экране, над тыквой)
+   ========================================================================== */
+/* [hidden] + display: держим правило, иначе display перебьёт HTML-атрибут */
+.rhythm-hint[hidden],
+.btn-play[hidden],
+.rhythm[hidden],
+.finale-caption[hidden] {
+  display: none;
+}
+
+.rhythm-hint {
+  font-size: clamp(1rem, 4.2vw, 1.2rem);
+  color: var(--bone-soft);
+  max-width: 24ch;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.btn-play {
+  font: inherit;
+  font-size: clamp(1.05rem, 4.6vw, 1.25rem);
+  color: #2a1203;
+  background: linear-gradient(160deg, var(--candle) 0%, var(--pumpkin) 60%, var(--pumpkin-deep) 100%);
+  border: 1px solid rgba(255, 220, 150, 0.5);
+  padding: 0.7rem 1.7rem;
+  min-height: 48px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow:
+    0 10px 28px rgba(255, 122, 26, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  transition: transform 0.15s ease;
+}
+.btn-play:active {
+  transform: scale(0.95);
+}
+.btn-play:focus-visible {
+  outline: 3px solid var(--candle);
+  outline-offset: 4px;
+}
+
+.rhythm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Полоса. contain:layout paint — ноты с transform не вылезают за бокс (iOS). */
+.rhythm-lane {
+  position: relative;
+  width: min(92vw, 520px);
+  height: 68px;
+  border-radius: 999px;
+  overflow: hidden;
+  contain: layout paint;
+  background: var(--rg-lane);
+  border: 1px solid rgba(255, 122, 26, 0.28);
+  box-shadow: inset 0 1px 8px rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+.rhythm-lane::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+  background: rgba(241, 231, 208, 0.18);
+}
+
+/* Кольцо-цель слева (позиция синхронна targetPct=12% в js/rhythm.js) */
+.rhythm-target {
+  position: absolute;
+  left: 12%;
+  top: 50%;
+  width: 48px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 3px solid var(--rg-target);
+  box-shadow: 0 0 14px rgba(255, 122, 26, 0.5);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.rhythm-target.flash {
+  transform: translate(-50%, -50%) scale(1.18);
+  box-shadow: 0 0 26px var(--candle);
+}
+
+/* Нота — маленький призрак: купол, глазки, волнистый низ */
+.rhythm-note {
+  position: absolute;
+  top: 50%;
+  width: 24px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  border-radius: 12px 12px 4px 4px;
+  background:
+    radial-gradient(circle at 34% 38%, var(--night) 0 2.2px, transparent 2.8px),
+    radial-gradient(circle at 66% 38%, var(--night) 0 2.2px, transparent 2.8px),
+    var(--rg-note);
+  -webkit-mask: radial-gradient(4px 4px at 4px 100%, transparent 98%, #000) 0 0 / 8px 100% repeat-x;
+  mask: radial-gradient(4px 4px at 4px 100%, transparent 98%, #000) 0 0 / 8px 100% repeat-x;
+  filter: drop-shadow(0 0 6px rgba(241, 231, 208, 0.55));
+  will-change: left;
+}
+.rhythm-note.hit {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform: translate(-50%, -80%) scale(1.8);
+  opacity: 0;
+}
+.rhythm-note.miss {
+  transition: opacity 0.2s ease;
+  opacity: 0;
+}
+
+.rhythm-combo {
+  min-height: 1.4em;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 7vw, 2.2rem);
+  color: var(--pumpkin);
+  letter-spacing: 0.04em;
+}
+
+/* В режиме игры тыква перестаёт «дышать» и становится кнопкой-целью */
+.finale.playing .finale-pumpkin .pumpkin-svg {
+  animation: none;
+}
+/* Попадание в такт → короткий «поп» тыквы (специфичность выше, чем animation:none) */
+.finale.playing .finale-pumpkin.pop .pumpkin-svg {
+  animation: pumpkin-pop 0.22s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rhythm-hint { animation: none; }
+}
+
+/* ==========================================================================
+   Плавающие частицы (призраки / конфеты)
+   ========================================================================== */
+.floaties {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  /* overflow:hidden на fixed-слое Safari НЕ обрезает промоутнутые (transform)
+     дочерние слои → горизонтальный скролл. contain:paint обрезает по боксу. */
+  overflow: clip;
+  contain: layout paint size;
+  pointer-events: none;
+}
+.floaty {
+  position: absolute;
+  bottom: -12vh;
+  font-size: var(--sz, 1.8rem);
+  opacity: var(--op, 0.6);
+  animation: rise var(--dur, 14s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* ==========================================================================
+   Паучки на нитках
+   ========================================================================== */
+.spiders {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  overflow: clip;
+  contain: layout paint size;
+  pointer-events: none;
+}
+/* Обёртка висит на нитке длиной --drop от верхнего края. .up — паучок под потолком. */
+.spider {
+  position: absolute;
+  top: 0;
+  left: var(--x);
+  width: var(--sz, 40px);
+  transform: translateY(var(--drop));
+  transition: transform 1.6s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+.spider.up {
+  transform: translateY(calc(-1 * var(--sz, 40px) - 10px));
+  transition: transform 0.55s cubic-bezier(0.5, 0, 0.75, 0);
+}
+/* Маятник с осью в точке крепления нитки (верх экрана) */
+.spider-swing {
+  animation: swing var(--swing, 4.5s) ease-in-out infinite;
+  transform-origin: 50% calc(-1 * var(--drop));
+}
+.spider-swing::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 70%;
+  width: 1px;
+  height: calc(var(--drop) + 60px);
+  background: rgba(241, 231, 208, 0.45);
+}
+.spider-body {
+  position: relative;
+  display: block;
+  width: 100%;
+  pointer-events: auto;
+  cursor: pointer;
+  filter: drop-shadow(0 0 1.5px rgba(241, 231, 208, 0.55));
+}
+
+/* ==========================================================================
+   Музыкальная кнопка (только если задана музыка)
+   ========================================================================== */
+.music-toggle[hidden] {
+  display: none;
+}
+.music-toggle {
+  position: fixed;
+  top: max(0.9rem, calc(env(safe-area-inset-top) + 0.5rem));
+  right: max(0.9rem, env(safe-area-inset-right));
+  z-index: 60;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 220, 150, 0.45);
+  background: radial-gradient(circle at 40% 35%, var(--candle), var(--pumpkin) 55%, var(--pumpkin-deep));
+  color: #2a1203;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow:
+    0 8px 22px rgba(255, 122, 26, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  display: grid;
+  place-items: center;
+  transition: transform 0.18s ease, opacity 0.25s ease;
+}
+.music-toggle:active {
+  transform: scale(0.92);
+}
+.music-toggle:focus-visible {
+  outline: 3px solid var(--candle);
+  outline-offset: 3px;
+}
+.music-toggle:not(.playing) {
+  opacity: 0.7;
+  filter: saturate(0.6);
+}
+.music-toggle.playing {
+  animation: music-halo 2.4s ease-in-out infinite;
+}
+.music-toggle.playing .music-icon {
+  animation: spin 3s linear infinite;
+}
+@keyframes music-halo {
+  0%, 100% { box-shadow: 0 8px 22px rgba(255, 122, 26, 0.4), 0 0 0 3px rgba(255, 122, 26, 0.14); }
+  50% { box-shadow: 0 8px 26px rgba(255, 122, 26, 0.55), 0 0 0 9px rgba(255, 122, 26, 0.04); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .music-toggle.playing,
+  .music-toggle.playing .music-icon {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   Оркестрованный вход + reveal on scroll
+   ========================================================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--rd, 0s);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+#hero-greeting { --rd: 0.05s; }
+#hero-title { --rd: 0.25s; }
+#hero-subtitle { --rd: 0.5s; }
+.hero .scroll-cue { --rd: 0.8s; }
+
+/* ==========================================================================
+   Анимации
+   ========================================================================== */
+@keyframes sway {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-3deg) translateY(-5px); }
+  75% { transform: rotate(3deg) translateY(-5px); }
+}
+@keyframes pumpkin-burst {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.14) rotate(-4deg); }
+  100% { transform: scale(0) rotate(10deg); opacity: 0; }
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.035); }
+}
+@keyframes pumpkin-pop {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+@keyframes smoulder {
+  0%, 100% { opacity: 0.32; }
+  50% { opacity: 0.5; }
+}
+@keyframes flicker {
+  0%, 100% { opacity: 0.88; }
+  12% { opacity: 0.74; }
+  20% { opacity: 0.95; }
+  48% { opacity: 0.8; }
+  56% { opacity: 1; }
+  80% { opacity: 0.84; }
+}
+@keyframes flicker-lit {
+  0%, 100% { opacity: 1; }
+  30% { opacity: 0.9; }
+  60% { opacity: 0.97; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+@keyframes swing {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+@keyframes rise {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(var(--drift, 6vw), -118vh) rotate(var(--spin, 20deg)); }
+}
+@keyframes bat-fly {
+  0% { transform: translate(-60px, var(--y0)); }
+  50% { transform: translate(50vw, var(--y1)); }
+  100% { transform: translate(calc(100vw + 60px), var(--y2)); }
+}
+@keyframes flap {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.45); }
+}
+@keyframes fog-drift {
+  to { background-position: 520px 100%, 520px 80%; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Доступность: reduced-motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.2s !important;
+  }
+  .floaties,
+  .bats { display: none; }
+  .reveal { opacity: 1; transform: none; }
+}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+  />
+  <meta name="theme-color" content="#1b1030" />
+  <link
+    rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E"
+  />
+  <title>Счастливого Halloween 🎃</title>
+  <meta name="description" content="Поздравление с Хэллоуином" />
+
+  <!-- PWA: манифест + иконки. Пути относительные — сайт может жить в подпапке GitHub Pages. -->
+  <link rel="manifest" href="manifest.json" />
+  <!-- iOS частично игнорирует манифест: установку на «Домой» держат apple-теги ниже. -->
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon-180.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Halloween" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Creepster&family=Underdog&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Общие градиенты SVG (тыква). Не display:none — иначе Safari/Chrome не рисуют
+       градиенты, на которые ссылаются другие SVG. -->
+  <svg class="svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="pk-skin" cx="0.4" cy="0.35" r="0.75">
+        <stop offset="0" stop-color="#f08a3a" />
+        <stop offset="0.5" stop-color="#d4580e" />
+        <stop offset="1" stop-color="#5e1d04" />
+      </radialGradient>
+      <radialGradient id="pk-skin-c" cx="0.42" cy="0.32" r="0.8">
+        <stop offset="0" stop-color="#f7953f" />
+        <stop offset="0.55" stop-color="#dd6012" />
+        <stop offset="1" stop-color="#6b2205" />
+      </radialGradient>
+      <radialGradient id="pk-fire" gradientUnits="userSpaceOnUse" cx="100" cy="118" r="70">
+        <stop offset="0" stop-color="#fff2b0" />
+        <stop offset="0.35" stop-color="#ffb020" />
+        <stop offset="0.75" stop-color="#ff5a00" />
+        <stop offset="1" stop-color="#c41e00" />
+      </radialGradient>
+      <linearGradient id="pk-stem" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#6b4a2a" />
+        <stop offset="1" stop-color="#22140a" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <!-- Тыква-фонарь: один источник разметки, клонируется в интро и финал
+       (и читается scripts/gen-icons.mjs для PWA-иконок). -->
+  <template id="pumpkin-tpl">
+    <svg class="pumpkin-svg" viewBox="0 0 200 190" aria-hidden="true" focusable="false">
+      <path d="M93 58 C88 45 96 36 91 23 C97 18 106 20 111 27 C104 36 109 46 108 58 Z" fill="url(#pk-stem)" />
+      <path d="M109 30 C124 17 143 25 137 40 C133 49 121 45 126 37" fill="none"
+        stroke="#3b2614" stroke-width="2.5" stroke-linecap="round" />
+      <ellipse cx="62" cy="114" rx="50" ry="62" fill="url(#pk-skin)" />
+      <ellipse cx="138" cy="114" rx="50" ry="62" fill="url(#pk-skin)" />
+      <ellipse cx="100" cy="112" rx="48" ry="66" fill="url(#pk-skin-c)" />
+      <path d="M79 52 Q67 112 81 176 M121 52 Q133 112 119 176" fill="none"
+        stroke="#5e1d04" stroke-opacity="0.5" stroke-width="3" />
+      <path d="M150 146 l7 5 l-3 7 l7 5 M40 150 l6 -4 l2 7 l6 -2" fill="none"
+        stroke="#3d1203" stroke-opacity="0.6" stroke-width="1.8" stroke-linecap="round" />
+      <ellipse cx="66" cy="78" rx="6" ry="14" transform="rotate(20 66 78)" fill="#fff" fill-opacity="0.12" />
+      <path d="M46 70 Q70 72 94 88 M154 70 Q130 72 106 88" fill="none"
+        stroke="#4a1603" stroke-opacity="0.7" stroke-width="3.5" stroke-linecap="round" />
+      <g class="pk-face" fill="url(#pk-fire)" stroke="#2a0a02" stroke-width="3" stroke-linejoin="round">
+        <path d="M50 79 L93 97 L80 107 Q61 107 53 96 Z" />
+        <path d="M150 79 L107 97 L120 107 Q139 107 147 96 Z" />
+        <path d="M92 123 L98 110 L99 124 Z M108 123 L102 110 L101 124 Z" />
+        <path d="M42 125 L58 133 L64 147 L70 136 L84 140 L90 155 L96 141 L104 141 L110 155 L116 140 L130 136 L136 147 L142 133 L158 125 Q156 151 136 164 L128 151 L120 169 L110 158 L100 172 L90 158 L80 169 L72 151 L64 164 Q44 151 42 125 Z" />
+      </g>
+    </svg>
+  </template>
+
+  <!-- Фон-атмосфера отдельным фиксированным слоем (без background-attachment:fixed):
+       ночное небо, луна, паутина в углах, летучие мыши, кладбище, туман. -->
+  <div class="bg" aria-hidden="true">
+    <div class="moon"></div>
+    <svg class="web web-left" viewBox="0 0 260 260"><path id="web-path" /></svg>
+    <svg class="web web-right" viewBox="0 0 260 260"><use href="#web-path" /></svg>
+    <div class="bats" id="bats"></div>
+    <svg class="graveyard" viewBox="0 0 400 120" preserveAspectRatio="xMidYMax meet">
+      <path d="M-700 130 L-700 96 Q-350 66 0 92 Q60 70 130 84 Q200 98 260 80 Q330 62 400 86 Q750 112 1100 84 L1100 130 Z" />
+      <path d="M38 86 L38 40 M38 58 L22 44 M22 44 L14 46 M22 44 L20 34 M38 50 L54 34 M54 34 L62 32 M54 34 L56 24 M38 66 L50 60"
+        fill="none" stroke-width="4" stroke-linecap="round" />
+      <path d="M150 90 L150 70 Q150 60 160 60 Q170 60 170 70 L170 90 Z" />
+      <path d="M196 92 L196 78 L202 78 L202 70 L208 70 L208 78 L214 78 L214 84 L208 84 L208 92 Z" />
+      <path d="M288 80 L288 62 Q288 52 299 52 Q310 52 310 62 L310 80 Z" />
+      <path d="M340 80 L340 70 Q340 64 347 64 Q354 64 354 70 L354 80 Z" />
+    </svg>
+    <div class="fog"></div>
+  </div>
+
+  <!-- 1. Интро: тыква со свечой. Тап → свеча вспыхивает → сайт. -->
+  <div id="intro-screen" class="intro-screen">
+    <div class="pumpkin intro-pumpkin" id="intro-pumpkin" role="button" tabindex="0"
+      aria-label="Зажечь тыкву"></div>
+    <p class="intro-hint" id="intro-hint">Коснись тыквы 🎃</p>
+  </div>
+
+  <!-- Плавающие частицы (призраки / конфеты) -->
+  <div class="floaties" id="floaties" aria-hidden="true"></div>
+
+  <!-- Паучки на нитках (поверх интро; тап — паучок убегает вверх) -->
+  <div class="spiders" id="spiders" aria-hidden="true"></div>
+
+  <!-- Основной контент -->
+  <main id="site" class="site" hidden>
+    <!-- 2. Hero -->
+    <section class="section hero" id="hero">
+      <p class="hero-greeting reveal" id="hero-greeting">Счастливого</p>
+      <h1 class="hero-title reveal" id="hero-title">Halloween</h1>
+      <p class="hero-subtitle reveal" id="hero-subtitle"></p>
+      <div class="scroll-cue reveal" aria-hidden="true">
+        <span id="scroll-cue-text">листай вниз</span>
+        <span class="chevron"></span>
+      </div>
+    </section>
+
+    <!-- Финал: тыква-фонарь + ритм-игра над ней -->
+    <section class="section finale" id="finale">
+      <!-- Полоса + комбо НАД тыквой: чтобы рука при тапе её не закрывала -->
+      <div class="rhythm" id="rhythm" hidden>
+        <p class="rhythm-combo" id="rhythm-combo" aria-live="polite"></p>
+        <div class="rhythm-lane" id="rhythm-lane">
+          <span class="rhythm-target" id="rhythm-target" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div class="pumpkin finale-pumpkin reveal" id="finale-pumpkin" role="button" tabindex="0"
+        aria-label="Тыква-фонарь"></div>
+      <p class="finale-caption reveal" id="finale-caption" hidden></p>
+
+      <!-- Ритм-игра (idle): призыв + кнопка старта -->
+      <p class="rhythm-hint" id="rhythm-hint" hidden></p>
+      <button class="btn-play" id="btn-play" type="button" hidden></button>
+
+      <button class="btn-replay" id="btn-replay" type="button"></button>
+    </section>
+  </main>
+
+  <!-- Музыкальная кнопка (появляется, если задана музыка) -->
+  <button class="music-toggle" id="music-toggle" type="button" hidden aria-label="Музыка">
+    <span class="music-icon">♪</span>
+  </button>
+
+  <audio id="bg-audio" loop preload="none"></audio>
+
+  <script src="js/config.js"></script>
+  <script src="js/confetti.js"></script>
+  <script src="js/rhythm-beatmap.js"></script>
+  <script src="js/rhythm.js"></script>
+  <script src="js/main.js"></script>
+
+  <!-- PWA: тихая регистрация service worker (офлайн). Не на file:// — иначе ошибка
+       при прямом открытии файла. На localhost SW НЕ регистрируем и сносим ранее
+       установленный + чистим кэши: иначе cache-first отдаёт старые файлы при отладке. -->
+  <script>
+    (function () {
+      if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+      var host = location.hostname;
+      var isLocal = host === "localhost" || host === "127.0.0.1" || host === "[::1]";
+      if (isLocal) {
+        navigator.serviceWorker.getRegistrations().then(function (rs) {
+          rs.forEach(function (r) { r.unregister(); });
+        });
+        if (window.caches) {
+          caches.keys().then(function (ks) { ks.forEach(function (k) { caches.delete(k); }); });
+        }
+        return;
+      }
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("sw.js").catch(function () {});
+      });
+    })();
+  </script>
+</body>
+</html>
