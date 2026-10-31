@@ -10,7 +10,7 @@
 //  Версию кэша (CACHE) поднимать при изменении закэшированных ассетов — иначе
 //  у уже установивших останется старая версия (cache-first не идёт в сеть за свежим).
 // ============================================================================
-const CACHE = "halloween-v4";
+const CACHE = "halloween-v5";
 const FONTS_CACHE = "halloween-fonts-v1";
 
 // App-shell — относительно scope воркера (подпапка Pages).
@@ -33,7 +33,12 @@ const ASSETS = [
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting())
+    // cache:"reload" — мимо HTTP-кэша браузера: Pages отдаёт max-age=600, и без этого
+    // новый SW мог положить в свежий кэш СТАРЫЕ файлы (так и случилось со styles.css).
+    caches
+      .open(CACHE)
+      .then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: "reload" }))))
+      .then(() => self.skipWaiting())
   );
 });
 
