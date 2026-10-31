@@ -266,8 +266,8 @@
     var rhythmTarget = $("rhythm-target");
     var comboEl = $("rhythm-combo");
 
-    rhythmHint.textContent = finale.playHint || "Жми на тыкву в ритм";
-    rhythmHint.hidden = false;
+    rhythmHint.textContent = finale.playHint || "";
+    rhythmHint.hidden = !finale.playHint;
     btnPlay.textContent = finale.play || "Играть в такт";
     btnPlay.hidden = false;
 
