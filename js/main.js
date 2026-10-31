@@ -332,7 +332,7 @@
   }
 
   /* ---- Плавающие частицы ------------------------------------------------ */
-  var EMOJI = ["👻", "🍬", "🕯️", "👻", "🍭", "✨"];
+  var EMOJI = ["👻", "🍬", "🎃", "👻", "🍭", "✨"];
   var floatiesStarted = false;
   function startFloaties() {
     if (floatiesStarted || reduceMotion) return;
