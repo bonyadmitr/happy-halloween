@@ -154,7 +154,8 @@ body {
   left: 0;
   bottom: 0;
   width: 100%;
-  height: clamp(100px, 26vw, 230px);
+  /* телефон: сцена на всю ширину (60vw = 120/200); широкий экран — потолок по высоте */
+  height: min(60vw, 240px);
   overflow: visible; /* холм продолжается за viewBox — на широких экранах до краёв */
   fill: var(--night-3);
   stroke: var(--night-3);

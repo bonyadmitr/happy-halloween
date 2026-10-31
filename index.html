@@ -101,16 +101,19 @@
     <svg class="web web-left" viewBox="0 0 260 260"><path id="web-path" /></svg>
     <svg class="web web-right" viewBox="0 0 260 260"><use href="#web-path" /></svg>
     <div class="bats" id="bats"></div>
-    <svg class="graveyard" viewBox="0 0 400 120" preserveAspectRatio="xMidYMax meet">
-      <path d="M-700 130 L-700 96 Q-350 66 0 92 Q60 70 130 84 Q200 98 260 80 Q330 62 400 86 Q750 112 1100 84 L1100 130 Z" />
-      <path d="M38 86 L38 40 M38 58 L22 44 M22 44 L14 46 M22 44 L20 34 M38 50 L54 34 M54 34 L62 32 M54 34 L56 24 M38 66 L50 60"
-        fill="none" stroke-width="4" stroke-linecap="round" />
-      <path d="M150 90 L150 70 Q150 60 160 60 Q170 60 170 70 L170 90 Z" />
-      <path d="M196 92 L196 78 L202 78 L202 70 L208 70 L208 78 L214 78 L214 84 L208 84 L208 92 Z" />
-      <path d="M288 80 L288 62 Q288 52 299 52 Q310 52 310 62 L310 80 Z" />
-      <path d="M340 80 L340 70 Q340 64 347 64 Q354 64 354 70 L354 80 Z" />
-    </svg>
     <div class="fog"></div>
+    <!-- Кладбище: сцена 200×120 под телефон (центр свободен — там кнопка «Happy Halloween»),
+         холм продолжается за viewBox — на широких экранах тянется до краёв. -->
+    <svg class="graveyard" viewBox="0 0 200 120" preserveAspectRatio="xMidYMax meet">
+      <path d="M-600 130 L-600 100 Q-300 84 0 98 Q40 88 80 96 Q100 100 120 97 Q160 86 200 96 Q500 112 800 96 L800 130 Z" />
+      <path d="M15 98 C17 84 17 70 18 48 L22 48 C22 70 23 84 26 98 Z" />
+      <path d="M20 66 C13 60 9 57 5 47 M20 57 C26 49 32 47 36 37 M20 76 C26 72 30 72 34 67" fill="none" stroke-width="2.6" stroke-linecap="round" />
+      <path d="M5 47 L1 45 M5 47 L6 39 M36 37 L42 35 M36 37 L35 29 M34 67 L39 64 M19 49 L17 41 M21 49 L24 42" fill="none" stroke-width="1.4" stroke-linecap="round" />
+      <path d="M47 99 L47 80 L41 80 L41 75 L47 75 L47 68 L53 68 L53 75 L59 75 L59 80 L53 80 L53 99 Z" />
+      <path d="M140 98 L140 74 Q140 64 148 64 Q156 64 156 74 L156 98 Z" transform="rotate(-7 148 98)" />
+      <path d="M164 97 L164 85 Q164 79 170 79 Q176 79 176 85 L176 97 Z" />
+      <path d="M184 96 L184 87 L181 87 L181 84 L184 84 L184 80 L187 80 L187 84 L190 84 L190 87 L187 87 L187 96 Z" />
+    </svg>
   </div>
 
   <!-- 1. Интро: тыква со свечой. Тап → свеча вспыхивает → сайт. -->
